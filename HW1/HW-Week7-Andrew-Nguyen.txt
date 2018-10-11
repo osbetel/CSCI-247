@@ -1,0 +1,31 @@
+/**
+ * Andrew Nguyen, CSCI 247 WWU, Spring 2017
+ */ 
+
+
+/*
+ * 3.68
+ * A = 9
+ * B = 5
+ *
+ * 180b ≤ AB ≤ 184b
+ * 7b ≤ A ≤ 10b
+ * 5b ≤ B ≤ 8b
+ *
+ * str2.t = int @ 8 bytes, %rsi
+ * str2.u = long @ 32 bytes, %rsi
+ * str1.y = long @ 184 bytes, %rdi
+ *
+ * We can use a system of equations and a martix to find the values of A and B
+ */
+
+/*
+ * 3.69
+ *
+ * CNT = 9
+ *
+ * typedef struct{
+ *    int idx;
+ *    int x[4];
+ * } a_struct;
+ */

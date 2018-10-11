@@ -1,0 +1,155 @@
+/*
+ * ASSIGNMENT 2.58
+ */
+int is_little_endian() {
+    /*
+     * Primary difference between big endian and little endian machines is the ordering of the bytes by significance.
+     * Big endian stores the most significant byte first, in the smallest address.
+     * Little endian stores the least significant byte first, in the smallest address.
+     *
+     * e.g.: if we have a hexadecimal number, 4A 3B 2C 1D, then big endian would be:
+     *          Byte    |   Mem. Addr.
+     *          4A      |   1000
+     *          3B      |   1001
+     *          2C      |   1002
+     *          1D      |   1003
+     *
+     * and little endian would be:
+     *          Byte    |   Mem. Addr.
+     *          1D      |   1000
+     *          2C      |   1001
+     *          3B      |   1002
+     *          4A      |   1003
+     *
+     * Note the opposite orders.
+     * */
+
+    //to determine endian-ness, make a number, get the memory address
+    int x = 0x4a3b2c1d;
+
+    //cast pointer to be interpreted as a char at the 1st address of x
+    char *c = (char*) &x; //why can't you use c instead of *c? *c is an integer, see notes
+//    printf("%d\n",*c);
+
+    //little endian will have 1d which is 29 at the first address, otherwise it will have 4a for big endian
+    if (*c == 29) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+
+/*
+ * ASSIGNMENT 2.59
+ */
+int swap_significance(int x, int y) {
+   /*
+    * Will take two words, and swap the least significant bytes of x and y
+    * and then return z as the final word. Note, returns the pointer to z
+    */
+    
+    //Creation of a char array to hold the bytes for a new integer
+    unsigned char zBytes[4];
+
+    //I couldn't figure this out without reading the bits directly into the zBytes array via shifts
+    zBytes[3] = (y >> 24);
+    zBytes[2] = (y >> 16);
+    zBytes[1] = (y >> 8);
+    zBytes[0] = (x >> 0);   //all bytes are the same as y except the least significant one which comes from x
+                            //this part depends on endianness – intel processors are generally little endian today
+
+    int* z = &zBytes;   //integer pointer to the array
+//    printf("%d\n", *z);
+
+    //wrote function to print individual hexadecimal bytes of an object
+//    print_bytes(&x, sizeof(x));
+//    print_bytes(&y, sizeof(y));
+//    print_bytes(&*z, sizeof(*z));
+
+    int result = *z;
+
+    return result;
+}
+
+
+
+
+/*
+ * ASSIGNMENT 2.73
+ */
+int saturating_add(int x, int y) {
+    /*
+     * Returns sum of x and y unless there is overflow, then returns INT_MIN or INT_MAX
+     * No conditional statements allowed... Overflow only occurs if adding two numbers with the same sign,
+     * purely due to the limits of an int data type, a positive number + a negative can't result in overflow.
+     *
+     * So if conditional statements like if, else, <, >, and so on aren't allowed, I need to find a  way to get a
+     * boolean return somewhere. == and != is allowed, all logic and bitwise operations are allowed,
+     * maybe an XOR could be used?
+     *
+     * 1) compare the signs of x and y,
+     * 2) if opposite signs, return x + y,
+     * 3) if same signs, add x + y and check the result's sign against the sign of x
+     * 4) if the sign is opposite to x, i.e.: overflow occursed and sign reversed, return min/max
+     */
+
+    /*
+    int x = 10;
+    int y = -10;
+    print_bytes(&x, sizeof(x));
+    print_bytes(&y, sizeof(y));
+                   Hex                        Binary
+              LSB =====> MSB  MSB ==============================> LSB
+     10     = [ 0a 00 00 00 ] 0000 0000 0000 0000 0000 0000 0000 1010
+    -10     = [ f6 ff ff ff ] 1111 1111 1111 1111 1111 1111 1111 0110
+    INT_MAX = [ ff ff ff 7f ] 0111 1111 1111 1111 1111 1111 1111 1111
+    INT_MIN = [ 00 00 00 80 ] 1000 0000 0000 0000 0000 0000 0000 0000
+     */
+
+    //integers are 4 bytes / 32 bits, in binary form, the most significant bit is the sign bit.
+    //sign_x/y then becomes 0 for positive numbers and 1 for negative numbers because of the (& 1)
+    //1000 0000 0000 0001 ===> 0000 0000 0000 0001 because +1 and -1 only share the 1 at the beginning
+    int sign_x = (x >> 31) & 1;
+    int sign_y = (y >> 31) & 1;
+
+//    printf("%d\n", sign_x);
+//    printf("%d\n", sign_y);
+//    print_bytes(&x, sizeof(x));
+//    print_bytes(&y, sizeof(y));
+
+    //Gives 0 if signs are the same, and 1 if signs are different
+    int sameSign = (sign_x - sign_y)*(sign_x-sign_y);	//Squared so the number is either +1 or 0 and not -1
+//    printf("%d\n", sameSign);
+
+    int result, sign_result = -1;   //If it's never used, it will remain -1
+
+    //if sameSign == 1, then signs are different, return x + y, if signs are same, set result to -1 (as a flag for later)
+    (sameSign == 1 && (result = x + y) || ((result = x + y)
+                                           & (sign_result = (result >> 31) & 1)
+                                           & (sameSign = (sign_x - sign_result)*(sign_x-sign_result))));
+
+    //if sign_result changes to 1, result overflowed to INT_MAX
+    ((sign_result == 1) & (sameSign == 1) && (result = INT_MAX));
+
+    //if sign_result changes to 0, result overflowed to INT_MIN
+    ((sign_result == 0) & (sameSign == 1) && (result = INT_MIN));
+
+//    printf("%d\n", sign_result);
+//    printf("%d\n", sameSign);
+
+    return result;
+    //I REALLY DID NOT LIKE THIS PROBLEM. Coulda been done with a simple if x < 0 to check for overflow! Just sayin.
+}
+
+int main() {
+    printf("%d\n", is_little_endian());                         //Returns 1 if little endian
+    printf("%x\n", swap_significance(0x89abcdef, 0x76543210));  //Should return 0x765432df (the 0x padding doesn't show)
+
+    printf("%d\n",saturating_add(9992344324,-9994798099));      //Returns -2,453,775
+    printf("%d\n",saturating_add(-9992344324,-9994798099));     //INT_MIN overflow
+    printf("%d\n",saturating_add(9992344324,9994798099));       //INT_MAX overflow
+
+    return 0;
+}

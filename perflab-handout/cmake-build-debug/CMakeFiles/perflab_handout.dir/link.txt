@@ -1,0 +1,1 @@
+/Library/Developer/CommandLineTools/usr/bin/cc  -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/perflab_handout.dir/clock.c.o CMakeFiles/perflab_handout.dir/driver.c.o CMakeFiles/perflab_handout.dir/fcyc.c.o CMakeFiles/perflab_handout.dir/kernels.c.o  -o perflab_handout 

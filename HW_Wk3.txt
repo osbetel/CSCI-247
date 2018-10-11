@@ -1,0 +1,70 @@
+/*
+ * Andrew Nguyen, W01183647
+ * Rrushi, CSCI247 Spring 2017
+ */
+
+/*
+ * 2.86
+ * An 80 bit word looks like:
+ *
+ * |S|    Exp (15bit)    |I|         Frac (63bit)         |
+ *
+ * For a total of 80 bits. Thus with 1 sign bit, 15 exp bits, 1 integer bit (ignore for calculation, just use regular
+ * normalised/denormalised rules), and 63 fractional bits:
+ *
+ * Smallest positive denormalized   :   2^-16382 * 2^-63                = 2^-16445
+ * Smallest positive normalized     :   2^-16382 * 1                    = 2^16382
+ * Largest normalized               :   2^49149 * ((2^63)-1) / (2^63)
+ */
+
+/*
+ * 2.90
+ */
+float fpwr2(int x) {
+
+    //Problem specifies IEEE single precision, 32 bits
+
+    unsigned exp, frac;
+    unsigned u;
+
+    if (x < -149) {
+        exp = 0;
+        frac = 0;
+    }
+
+    else if (x < -126) {
+        exp = 1;
+        frac = 1 << (23 - (-126 - x));
+    }
+
+    else if (x < 128) {
+        exp = x + 127;
+        frac = 0;
+    }
+
+    else {
+        exp = 255;
+        frac = 0;
+    }
+
+    u = exp << 23 | frac;
+    return u2f(u);
+}
+
+/*
+ * 2.91
+ *
+ * If π has a hex value of 0x40490FDB... Left to right, sign bit first etc. due to endianness inside this comp
+ *
+ * A) the fractional binary number for pi is 0 10000000 10010010000111111011011
+ *      Separated by sign bit, exp, fractional
+ *
+ * B) Binary representation of 22/7 is 11 . 0010 0100 0011 1111 0101 1 ....
+ *      This can be gotten using the regular method to convert decimal to binary (not the same as decimal to float)
+ *      ie: 11 = 3, followed by the decimal form of 1/7
+ *
+ * C)   0 0100100 10000111111011011  
+ *      0 0100100 0011111101011
+ *      
+ *      After 8 bits, the two approximations diverge. So on the 9th bit
+ */

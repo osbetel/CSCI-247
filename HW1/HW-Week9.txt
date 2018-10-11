@@ -1,0 +1,25 @@
+/**
+ * Andrew Nguyen, CSCI 247 WWU, Spring 2017
+ */ 
+
+
+/*
+ * Andrew Nguyen, CSCI 247, Spring 2017, Julian Rrushi
+ * 6.23
+ *
+ * Average time to access a sector on a disk:
+ * = (Avg. Seek Time) + (Rotational Latency) + (Transfer/Sector Read Time)
+ * All in milliseconds,
+ *
+ * Avg. seek given as 4ms
+ * Rotational speed given as 15000rpm, which is equivalent to (15000rot/1min) * (1min/60s) * (1s/1000ms)
+ *      = 15000rot / 60000ms = 1rot / 4ms
+ * Transfer time is the time to read the sector,
+ * which is defined as (time for 1 rotation) / (avg sectors per track)
+ * In this case, avg sectors per track is given as 800.
+ * So Transfer time = 4ms / 800 SPT = 0.005ms
+ *
+ * Total average time to access sector on the given disk is:
+ * 
+ * = 4ms + 4ms + 0.005ms = 8.005ms
+ */
